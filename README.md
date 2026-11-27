@@ -2,6 +2,32 @@
 
 A Django and Django REST Framework application for product-image inspections. Celery workers run the supplied frozen classifier, with Redis as the task broker. SQLite is the local default; PostgreSQL can be selected with environment variables.
 
+## Why This Project Is Useful
+
+This project provides a practical visual quality-control system for manufacturing or product inspection teams. It allows engineers to upload product images, processes them through an AI classifier, and gives supervisors a structured workflow to verify or correct predictions.
+
+- Reduces manual inspection effort by automatically screening product images.
+- Keeps the original AI prediction separate from human review decisions.
+- Processes multiple uploaded images in batches and reports each item's status.
+- Helps teams measure model performance through metrics such as defect recall and confusion matrices.
+- Restricts product management and review actions according to user roles.
+- Supports both a browser interface and REST API for integration with other systems.
+
+## Features
+
+- **Role-based access:** Separate experiences and permissions for Administrators, Engineers, and Supervisors.
+- **Product management:** Create, view, update, and remove products by authenticated users with role-based write controls.
+- **Image validation:** Rejects non-images, corrupted files, and images that are too small before model processing.
+- **Batch inspections:** Upload and track up to 10 images in a single inspection batch.
+- **AI classification:** Runs the supplied frozen classifier asynchronously through a Celery worker.
+- **Prediction history:** Stores original predictions, confidence, status, timestamps, and model output.
+- **Human review:** Supervisors can confirm or correct completed predictions while preserving the original AI result.
+- **History and filters:** Search inspections by prediction, review status, product, and other recorded fields.
+- **Evaluation metrics:** Generates confusion matrices and defect-recall reports from labeled sample images.
+- **REST API:** Provides endpoints for uploads, inspections, reviews, batches, and product management.
+- **Database flexibility:** Uses SQLite locally and supports PostgreSQL through environment configuration.
+- **Demo data:** Includes demo users and a sample product for quick evaluation.
+
 ## Requirements
 
 - Python 3.11 or newer
