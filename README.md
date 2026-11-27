@@ -27,6 +27,24 @@ This project provides a practical visual quality-control system for manufacturin
 - **REST API:** Provides endpoints for uploads, inspections, reviews, batches, and product management.
 - **Database flexibility:** Uses SQLite locally and supports PostgreSQL through environment configuration.
 - **Demo data:** Includes demo users and a sample product for quick evaluation.
+- **Manual library:** Stores machine manuals, revisions, upload history, and links them to machines.
+
+## What We Use and Why
+
+| Technology | Used for |
+|---|---|
+| Django | Web application framework, authentication, ORM, forms, templates, routing, and the Django admin. |
+| Django REST Framework | JSON API endpoints, pagination, request validation, and API permissions. |
+| Celery | Running image-classification jobs asynchronously so uploads do not block the web request. |
+| Redis | Celery message broker and task result backend. |
+| SQLite | Simple local database that requires no separate database server. |
+| PostgreSQL | Optional production-style database for configured deployments. |
+| NumPy | Running the supplied frozen classifier and processing model arrays. |
+| Pillow | Image validation and basic image file handling. |
+| Bootstrap-style templates and Django templates | Responsive browser pages and server-rendered role-specific interfaces. |
+| Python `unittest`/Django test runner | Testing models, permissions, APIs, views, validation, and Celery behavior. |
+
+The main request flow is: an authenticated browser or API client uploads an image, Django validates it and creates an inspection, Celery processes it asynchronously with Redis, and Django stores both the immutable AI prediction and any supervisor review separately.
 
 ## Requirements
 
