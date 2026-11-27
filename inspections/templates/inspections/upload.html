@@ -1,0 +1,82 @@
+{% extends "inspections/base.html" %}
+{% block title %}Upload Images · Visual Inspection{% endblock %}
+{% block content %}
+<div class="page-heading mb-4">
+  <div class="d-flex align-items-center gap-2 mb-1">
+    <span class="badge bg-primary bg-opacity-10 text-primary fw-semibold px-2 py-1">INSPECTION BATCH</span>
+    <span class="badge bg-secondary">P-PLATE01</span>
+  </div>
+  <h1 class="h2 fw-bold text-dark mb-1">Upload Inspection Images</h1>
+  <p class="text-secondary">Upload 1 to 10 product plate images. Each file is verified through the validation pipeline before invoking the model.</p>
+</div>
+
+<div id="upload-alert" class="alert d-none shadow-sm" role="alert"></div>
+
+<form id="inspection-upload-form" data-upload-url="{% url 'inspection-upload' %}" data-batch-url-template="/batches/{id}/">
+  {% csrf_token %}
+  <div class="row g-4">
+    <!-- Form Upload Column -->
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm rounded-3 h-100">
+        <div class="card-header bg-white py-3 border-bottom">
+          <h5 class="card-title mb-0 fw-bold">
+            <i class="bi bi-cloud-arrow-up text-primary me-2"></i> Submit Inspection Batch
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="mb-3">
+            <label for="product-id" class="form-label fw-semibold">Target Product</label>
+            <select class="form-select" id="product-id" name="product_id" required>
+              <option value="">Select a product</option>
+              {% for product in products %}
+                <option value="{{ product.product_id }}" {% if product.product_id == 'P-PLATE01' %}selected{% endif %}>
+                  {{ product.name }} ({{ product.product_id }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="inspection-files" class="form-label fw-semibold">Select 1 to 10 Images</label>
+            <input class="form-control" id="inspection-files" name="files" type="file" accept="image/jpeg,image/png" multiple required>
+            <div class="form-text mt-2">
+              <strong>Validation Rules:</strong> Decoded JPEG or PNG only &bull; Dimensions 64x64 to 4096x4096px &bull; Max 5 MiB per file &bull; 1 to 10 files per batch.
+            </div>
+          </div>
+
+          <div class="alert alert-light border small mt-4 mb-0">
+            <div class="fw-semibold text-secondary mb-1">
+              <i class="bi bi-shield-check text-success me-1"></i> Pre-Inference Validation
+            </div>
+            Fake extensions (<code>not_an_image.jpg</code>), truncated images (<code>corrupt_image.png</code>), and undersized images (<code>too_small.png</code>) will be quarantined as failed attempts without reaching model inference.
+          </div>
+
+          <button class="btn btn-primary w-100 py-2 mt-4 fw-semibold" id="upload-submit" type="submit">
+            <i class="bi bi-play-circle me-1"></i> Upload and Inspect
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Preview Column -->
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm rounded-3 h-100">
+        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0 fw-bold">
+            <i class="bi bi-images text-primary me-2"></i> Selected Images Preview
+          </h5>
+          <span class="badge bg-light text-secondary border" id="preview-count-badge">0 files</span>
+        </div>
+        <div class="card-body p-4">
+          <div id="image-preview" class="preview-grid" aria-live="polite">
+            <div class="text-center py-5 text-muted">
+              <i class="bi bi-file-earmark-image fs-1 mb-2 text-secondary d-block"></i>
+              No images selected yet. Choose files on the left to preview.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

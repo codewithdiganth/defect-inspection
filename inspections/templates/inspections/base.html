@@ -1,0 +1,127 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Visual Quality Inspection · P-PLATE01{% endblock %}</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="{% static 'inspections/app.css' %}" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .badge-role-admin { background-color: #7c3aed; color: #fff; }
+    .badge-role-supervisor { background-color: #0d9488; color: #fff; }
+    .badge-role-engineer { background-color: #2563eb; color: #fff; }
+    
+    .status-badge.completed { background-color: #16a34a !important; color: #fff; }
+    .status-badge.failed { background-color: #dc2626 !important; color: #fff; }
+    .status-badge.processing { background-color: #0284c7 !important; color: #fff; }
+    .status-badge.queued { background-color: #64748b !important; color: #fff; }
+
+    .action-card {
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+    }
+    .action-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+    .matrix-table th, .matrix-table td {
+      text-align: center;
+      vertical-align: middle;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center fw-bold" href="{% url 'dashboard' %}">
+        <i class="bi bi-shield-check text-warning me-2 fs-4"></i>
+        <span>Visual Inspection</span>
+        <span class="badge bg-secondary ms-2 small" style="font-size: 0.7rem;">BIT-PLATE-CV-1.0</span>
+      </a>
+      {% if user.is_authenticated %}
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <div class="navbar-nav me-auto">
+          {% if role == "Engineer" or role == "Supervisor" %}
+          <a class="nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'upload' %}active fw-semibold{% endif %}" href="{% url 'upload' %}">
+            <i class="bi bi-cloud-arrow-up me-1"></i> Upload
+          </a>
+          {% endif %}
+          <a class="nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'history' %}active fw-semibold{% endif %}" href="{% url 'history' %}">
+            <i class="bi bi-clock-history me-1"></i> History
+          </a>
+          {% if role == "Administrator" or role == "Supervisor" %}
+          <a class="nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'metrics' %}active fw-semibold{% endif %}" href="{% url 'metrics' %}">
+            <i class="bi bi-graph-up me-1"></i> Metrics
+          </a>
+          {% endif %}
+          {% if role == "Administrator" %}
+          <a class="nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'products' %}active fw-semibold{% endif %}" href="{% url 'products' %}">
+            <i class="bi bi-boxes me-1"></i> Products
+          </a>
+          <a class="nav-link d-flex align-items-center" href="/admin/" target="_blank">
+            <i class="bi bi-sliders me-1"></i> Admin
+          </a>
+          {% endif %}
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span class="navbar-text text-light small d-flex align-items-center">
+            <i class="bi bi-person-circle me-1 fs-6"></i>
+            <strong class="me-1">{{ user.username }}</strong>
+            <span class="badge 
+              {% if role == 'Administrator' %}badge-role-admin
+              {% elif role == 'Supervisor' %}badge-role-supervisor
+              {% else %}badge-role-engineer{% endif %}">
+              {{ role|default:"User" }}
+            </span>
+          </span>
+          <form method="post" action="{% url 'logout' %}" class="d-inline">
+            {% csrf_token %}
+            <button class="btn btn-outline-light btn-sm d-flex align-items-center" type="submit">
+              <i class="bi bi-box-arrow-right me-1"></i> Log out
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </nav>
+
+  <main class="container py-4 flex-grow-1">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-dismissible fade show shadow-sm {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags|default:'info' }}{% endif %}" role="alert">
+          <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% elif message.tags == 'error' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %} me-2"></i>
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="py-3 bg-white border-top text-center text-muted small mt-auto">
+    <div class="container">
+      <span>P-PLATE01 Quality Inspection System &bull; BIT-PLATE-CV-1.0 Pretrained Model &bull; Blessed IT Solution Hackathon</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'inspections/app.js' %}" defer></script>
+<agent-embed src="file:///Users/diganthas/.gemini/antigravity/brain/1823986c-4084-4ca5-9901-e702af746f51/assistant_widget.html"></agent-embed>
+<agent-embed src="file:///Users/diganthas/.gemini/antigravity/brain/1823986c-4084-4ca5-9901-e702af746f51/assistant_widget.html?context={{ request.resolver_match.url_name|default:'dashboard' }}"></agent-embed>
+</body>
+</html>

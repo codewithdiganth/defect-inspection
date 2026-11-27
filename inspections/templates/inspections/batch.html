@@ -1,0 +1,57 @@
+{% extends "inspections/base.html" %}
+{% block title %}Batch #{{ batch_id }} Status · Visual Inspection{% endblock %}
+{% block content %}
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <span class="badge bg-primary bg-opacity-10 text-primary fw-semibold px-2 py-1">BATCH EXECUTION</span>
+      <span class="badge bg-secondary">BIT-PLATE-CV-1.0</span>
+    </div>
+    <h1 class="h2 fw-bold text-dark mb-0">Batch #{{ batch_id }} Status</h1>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-primary" href="{% url 'upload' %}">
+      <i class="bi bi-plus-circle me-1"></i> New Batch
+    </a>
+    <a class="btn btn-outline-secondary" href="{% url 'history' %}">
+      <i class="bi bi-clock-history me-1"></i> View History
+    </a>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+  <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0 fw-bold">
+      <i class="bi bi-layers me-2 text-primary"></i> Batch Items Overview
+    </h5>
+    <span class="badge bg-light text-muted border" id="batch-poll-badge">Live Updating</span>
+  </div>
+  <div class="table-responsive">
+    <table class="table align-middle mb-0 table-hover">
+      <thead class="table-light">
+        <tr>
+          <th style="width: 70px;">Image</th>
+          <th>File</th>
+          <th>Status</th>
+          <th>Prediction</th>
+          <th>Confidence</th>
+          <th>Defect Probability</th>
+          <th>Details / Message</th>
+        </tr>
+      </thead>
+      <tbody id="batch-results" data-batch-id="{{ batch_id }}" data-api-url="/api/batches/{{ batch_id }}/">
+        <tr>
+          <td colspan="7" class="text-center text-secondary py-5">
+            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+            Loading batch items…
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<p class="small text-secondary mt-3 d-flex align-items-center" id="batch-poll-status" aria-live="polite">
+  <i class="bi bi-arrow-repeat me-1"></i> Refreshing status while items are processing.
+</p>
+{% endblock %}

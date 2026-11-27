@@ -1,0 +1,32 @@
+{% extends "inspections/base.html" %}
+{% block title %}Manuals{% endblock %}
+{% block content %}
+<h2 class="mb-4">Manual Library</h2>
+<a href="{% url 'manual-upload' %}" class="btn btn-primary mb-3">Upload Manual</a>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Document</th>
+      <th>Machine</th>
+      <th>Revision</th>
+      <th>Uploaded By</th>
+      <th>Uploaded At</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for manual in manuals %}
+    <tr>
+      <td>{{ manual.document_name }}</td>
+      <td>{{ manual.machine.machine_id }}</td>
+      <td>{{ manual.revision }}</td>
+      <td>{{ manual.uploaded_by.username }}</td>
+      <td>{{ manual.uploaded_at|date:"Y-m-d H:i" }}</td>
+      <td><a href="{% url 'manual-detail' manual.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6" class="text-center text-muted">No manuals uploaded yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

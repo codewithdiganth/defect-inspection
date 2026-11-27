@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - Manual Assistant</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+body{background:#f8fafc;font-family:'Segoe UI',sans-serif}
+.sidebar{background:linear-gradient(180deg,#0f172a 0%,#1e293b 100%);min-height:100vh;color:white;padding:24px;position:sticky;top:0}
+.nav-item{padding:12px 16px;border-radius:10px;margin-bottom:8px;cursor:pointer;transition:0.3s;display:flex;align-items:center}
+.nav-item:hover,.nav-item.active{background:rgba(59,130,246,0.2);border-left:3px solid #3b82f6}
+.card-modern{border:none;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.06);transition:0.3s}
+.card-modern:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.12)}
+.stat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.upload-area{border:2px dashed #cbd5e1;border-radius:16px;padding:32px;text-align:center;background:#f8fafc;transition:0.3s;cursor:pointer}
+.upload-area:hover{border-color:#3b82f6;background:#eff6ff}
+.btn-gradient{background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:10px;padding:10px 20px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="container-fluid"><div class="row">
+<!-- Sidebar -->
+<div class="col-md-2 sidebar">
+<div class="d-flex align-items-center mb-4"><div style="width:40px;height:40px;background:#3b82f6;border-radius:10px;display:flex;align-items:center;justify-content:center"><i class="fas fa-book-open"></i></div><div class="ms-3"><h6 class="mb-0 fw-bold">Manual Assistant</h6><small style="opacity:0.6">Admin Panel</small></div></div>
+<div class="nav-item active"><i class="fas fa-tachometer-alt me-3"></i>Dashboard</div>
+<div class="nav-item" onclick="location.href='/engineer/'"><i class="fas fa-tools me-3"></i>Engineer View</div>
+<div class="nav-item" onclick="location.href='/supervisor/'"><i class="fas fa-chart-line me-3"></i>Supervisor View</div>
+<div class="nav-item mt-4" onclick="location.href='/logout/'"><i class="fas fa-sign-out-alt me-3"></i>Logout</div>
+<div class="mt-4 p-3" style="background:rgba(255,255,255,0.06);border-radius:12px"><small><i class="fas fa-info-circle me-1"></i>Admin can add machines and upload manuals. Engineers can only ask.</small></div>
+</div>
+
+<!-- Main -->
+<div class="col-md-10 p-4">
+<div class="d-flex justify-content-between align-items-center mb-4"><h3 class="fw-bold"><i class="fas fa-shield-alt text-primary me-2"></i>Admin Dashboard</h3><span class="badge bg-success"><i class="fas fa-circle" style="font-size:6px"></i> Live • Port 8001</span></div>
+
+<!-- Stats -->
+<div class="row mb-4">
+<div class="col-md-3"><div class="card card-modern p-3"><div class="d-flex"><div class="stat-icon" style="background:#dbeafe"><i class="fas fa-cogs text-primary"></i></div><div class="ms-3"><h5 class="mb-0" id="machineCount">2</h5><small class="text-muted">Machines</small></div></div></div></div>
+<div class="col-md-3"><div class="card card-modern p-3"><div class="d-flex"><div class="stat-icon" style="background:#d1fae5"><i class="fas fa-file-pdf text-success"></i></div><div class="ms-3"><h5 class="mb-0" id="docCount">0</h5><small class="text-muted">Manuals Uploaded</small></div></div></div></div>
+<div class="col-md-3"><div class="card card-modern p-3"><div class="d-flex"><div class="stat-icon" style="background:#fef3c7"><i class="fas fa-database text-warning"></i></div><div class="ms-3"><h5 class="mb-0" id="chunkCount">0</h5><small class="text-muted">Chunks Indexed</small></div></div></div></div>
+<div class="col-md-3"><div class="card card-modern p-3"><div class="d-flex"><div class="stat-icon" style="background:#ede9fe"><i class="fas fa-check-circle" style="color:#8b5cf6"></i></div><div class="ms-3"><h5 class="mb-0">PyMuPDF + ChromaDB</h5><small class="text-muted">RAG Ready</small></div></div></div></div>
+</div>
+
+<div class="row">
+<!-- Add Machine -->
+<div class="col-md-5"><div class="card card-modern p-4 h-100">
+<h5 class="fw-bold mb-3"><i class="fas fa-plus-circle text-primary me-2"></i>Add Machine</h5>
+<p class="text-muted small">Add new machine type like M-HP200, M-AC90. This will be used to filter manuals.</p>
+<div class="mb-3"><label class="small fw-semibold text-muted">MACHINE ID (e.g. M-HP200)</label><input id="mid" placeholder="M-HP200" class="form-control" style="border-radius:10px;padding:12px"></div>
+<div class="mb-3"><label class="small fw-semibold text-muted">MACHINE NAME (e.g. HP-200)</label><input id="mname" placeholder="HP-200" class="form-control" style="border-radius:10px;padding:12px"></div>
+<button onclick="addM()" class="btn btn-gradient w-100"><i class="fas fa-plus me-2"></i>Add Machine</button>
+<div id="machineList" class="mt-3"></div>
+</div></div>
+
+<!-- Upload Manual -->
+<div class="col-md-7"><div class="card card-modern p-4">
+<h5 class="fw-bold mb-3"><i class="fas fa-cloud-upload-alt text-success me-2"></i>Upload Manual (Admin Only)</h5>
+<p class="text-muted small">Upload PDF manuals. System will extract text with PyMuPDF and index into ChromaDB for RAG.</p>
+<form id="upForm">
+<div class="row">
+<div class="col-md-4 mb-3"><label class="small fw-semibold text-muted">MACHINE ID</label><input name="machine_id" placeholder="M-HP200" class="form-control" style="border-radius:10px" required></div>
+<div class="col-md-4 mb-3"><label class="small fw-semibold text-muted">DOCUMENT ID</label><input name="document_id" placeholder="HP200_OPS" class="form-control" style="border-radius:10px" required></div>
+<div class="col-md-4 mb-3"><label class="small fw-semibold text-muted">REVISION</label><input name="revision" placeholder="1.0" class="form-control" style="border-radius:10px" value="1.0" required></div>
+</div>
+<div class="upload-area mb-3" onclick="document.querySelector('input[type=file]').click()">
+<i class="fas fa-file-pdf fa-3x text-muted mb-2"></i><br>
+<strong>Click to choose PDF file</strong><br>
+<small class="text-muted">HP200_Operations_Rev1_0.pdf, HP200_Maintenance_Rev1_0.pdf, AC90_Operations_Maintenance_Rev1_0.pdf</small><br>
+<input type="file" name="file" class="form-control mt-2" accept=".pdf" style="display:none" onchange="showFileName(this)">
+<div id="fileName" class="mt-2 text-primary fw-bold"></div>
+</div>
+<button class="btn btn-success w-100" style="border-radius:10px;padding:12px;font-weight:600"><i class="fas fa-upload me-2"></i>Upload + Index with PyMuPDF</button>
+</form>
+<div id="msg" class="mt-3"></div>
+<div class="mt-3 p-3" style="background:#f0fdf4;border-radius:10px;font-size:12px"><strong>What happens after upload?</strong><br>• PyMuPDF extracts text per page<br>• Chunks created (400-600 tokens)<br>• Embedded with sentence-transformers<br>• Stored in ChromaDB with machine_id filter<br>• Ready for Engineer to ask!</div>
+</div></div>
+</div>
+
+<!-- Recent Uploads -->
+<div class="card card-modern p-4 mt-4"><h5 class="fw-bold"><i class="fas fa-history me-2"></i>How to test after upload</h5><div class="row"><div class="col-md-4"><div class="p-3" style="background:#eff6ff;border-radius:10px"><strong>1. Login as Engineer</strong><br><small>engineer / eng123<br>Go to /engineer/</small></div></div><div class="col-md-4"><div class="p-3" style="background:#f0fdf4;border-radius:10px"><strong>2. Ask Question</strong><br><small>Select M-HP200<br>Ask "What does E17 mean?"</small></div></div><div class="col-md-4"><div class="p-3" style="background:#fef3c7;border-radius:10px"><strong>3. Check Isolation</strong><br><small>Select M-AC90<br>Ask same E17 → Should say insufficient</small></div></div></div></div>
+</div>
+</div></div>
+
+<script>
+function showFileName(input){ if(input.files[0]) document.getElementById('fileName').innerText='Selected: '+input.files[0].name }
+function addM(){fetch('/api/machines/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{csrf_token}}'},body:JSON.stringify({machine_id:document.getElementById('mid').value,name:document.getElementById('mname').value})}).then(r=>r.json()).then(d=>{alert('Machine added: '+JSON.stringify(d)); location.reload()})}
+document.getElementById('upForm').onsubmit=(e)=>{e.preventDefault();let fd=new FormData(e.target);document.getElementById('msg').innerHTML='<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i>Indexing PDF with PyMuPDF... Please wait 15-20 seconds</div>';fetch('/api/manuals/upload/',{method:'POST',headers:{'X-CSRFToken':'{{csrf_token}}'},body:fd}).then(r=>r.json()).then(d=>{document.getElementById('msg').innerHTML=`<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i><strong>Success!</strong> ${JSON.stringify(d)}<br>Chunks: ${d.chunks||d.chunk_count||'Done'} - Ready for Engineer to ask!</div>`; let c=parseInt(document.getElementById('chunkCount').innerText)||0; document.getElementById('chunkCount').innerText=c+(d.chunks||0); document.getElementById('docCount').innerText=parseInt(document.getElementById('docCount').innerText)+1;})}
+</script>
+</body>
+</html>

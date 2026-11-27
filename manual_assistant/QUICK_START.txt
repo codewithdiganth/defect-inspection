@@ -1,0 +1,32 @@
+QUICK START - 3 MINUTES
+
+1. Setup:
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+2. DB:
+rm db.sqlite3
+python manage.py makemigrations manual_assistant
+python manage.py migrate
+
+3. Users:
+python manage.py shell
+from manual_assistant.models import User
+User.objects.create_user('admin','a@test.com','admin123', role='Admin')
+User.objects.create_user('engineer','e@test.com','eng123', role='Engineer')
+User.objects.create_user('supervisor','s@test.com','sup123', role='Supervisor')
+exit()
+
+4. Run:
+python manage.py runserver 8001
+Open http://127.0.0.1:8001/
+
+Credentials:
+admin/admin123 - Upload manuals
+engineer/eng123 - Ask questions
+supervisor/sup123 - View history
+
+Test Isolation:
+M-HP200 + What does E17 mean? -> Answered Page 42
+M-AC90 + Same -> Insufficient -> Proves isolation
